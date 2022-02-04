@@ -15,6 +15,14 @@
         android:src="@color/black"
         android:scaleType="fitCenter" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"/>
+
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"

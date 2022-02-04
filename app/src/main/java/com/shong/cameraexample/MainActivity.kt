@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
@@ -41,12 +42,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val imageView = findViewById<ImageView>(R.id.imageView)
+        val textView = findViewById<TextView>(R.id.textView)
 
         resultLauncherCamera = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) { result ->
             if (result?.resultCode == Activity.RESULT_OK) {
                 val selectedImageUri : Uri = cameraPhotoFilePath ?: return@registerForActivityResult
 
+                getNameSize(selectedImageUri, textView)
                 showImage(selectedImageUri, imageView)
             }else if(result?.resultCode == Activity.RESULT_CANCELED){
                 Log.d(TAG,"Camera shot cancel!")
@@ -58,6 +61,7 @@ class MainActivity : AppCompatActivity() {
             if (result?.resultCode == Activity.RESULT_OK) {
                 val selectedImageUri= result.data?.data ?: return@registerForActivityResult
 
+                getNameSize(selectedImageUri, textView)
                 showImage(selectedImageUri, imageView)
             }else if(result?.resultCode == Activity.RESULT_CANCELED){
                 Log.d(TAG,"Image select cancel!")
@@ -161,6 +165,18 @@ class MainActivity : AppCompatActivity() {
                 dismiss()
             }
         }.show()
+    }
+
+    private fun getNameSize(selectedImageUri: Uri, textView : TextView){
+        contentResolver.query(selectedImageUri, null, null, null, null)
+            ?.use { cursor ->
+                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                cursor.moveToFirst()
+                val name = cursor.getString(nameIndex) // 이미지 이름
+                val size = cursor.getLong(sizeIndex).toString() // 이미지 사이즈
+                textView.text = "name : $name\nsize : $size"
+            }
     }
 
     private fun showImage(uri: Uri, iv: ImageView){
