@@ -29,4 +29,10 @@
         android:layout_height="wrap_content"
         android:text="Get Image!"/>
 
+    <Button
+        android:id="@+id/goLibraryButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Go Library!"/>
+
 </LinearLayout>

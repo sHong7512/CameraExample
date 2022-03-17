@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import coil.load
 import com.google.android.material.snackbar.Snackbar
+import com.shong.cameraexample.databinding.ActivityMainBinding
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -39,18 +40,17 @@ class MainActivity : AppCompatActivity() {
     private var cameraPhotoFilePath: Uri? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        val imageView = findViewById<ImageView>(R.id.imageView)
-        val textView = findViewById<TextView>(R.id.textView)
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         resultLauncherCamera = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) { result ->
             if (result?.resultCode == Activity.RESULT_OK) {
                 val selectedImageUri : Uri = cameraPhotoFilePath ?: return@registerForActivityResult
 
-                getNameSize(selectedImageUri, textView)
-                showImage(selectedImageUri, imageView)
+                getNameSize(selectedImageUri, binding.textView)
+                showImage(selectedImageUri, binding.imageView)
             }else if(result?.resultCode == Activity.RESULT_CANCELED){
                 Log.d(TAG,"Camera shot cancel!")
             }
@@ -61,8 +61,8 @@ class MainActivity : AppCompatActivity() {
             if (result?.resultCode == Activity.RESULT_OK) {
                 val selectedImageUri= result.data?.data ?: return@registerForActivityResult
 
-                getNameSize(selectedImageUri, textView)
-                showImage(selectedImageUri, imageView)
+                getNameSize(selectedImageUri, binding.textView)
+                showImage(selectedImageUri, binding.imageView)
             }else if(result?.resultCode == Activity.RESULT_CANCELED){
                 Log.d(TAG,"Image select cancel!")
             }
@@ -70,6 +70,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.button).setOnClickListener {
             checkPermission()
+        }
+
+        findViewById<Button>(R.id.goLibraryButton).setOnClickListener {
+            startActivity(Intent(this,LibraryExActivity::class.java))
         }
 
     }
@@ -159,8 +163,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             findViewById<TextView>(R.id.albumTextView).setOnClickListener {
-                val intent = Intent(Intent.ACTION_PICK)
-                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+                val intent = Intent(Intent.ACTION_PICK).apply {
+                    setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+//                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                }
                 resultLauncherPhoto.launch(intent)
                 dismiss()
             }
@@ -190,6 +196,5 @@ class MainActivity : AppCompatActivity() {
 //            error(R.drawable.img_profile_120)
         }
     }
-
 
 }
